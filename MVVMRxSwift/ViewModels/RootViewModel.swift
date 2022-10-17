@@ -6,3 +6,18 @@
 //
 
 import Foundation
+import RxSwift
+
+final class RootViewModel {
+    let title = "Sook News"
+    
+    private let articleService: ArticleServiceProtocal
+    
+    init(articleService: ArticleServiceProtocal) {
+        self.articleService = articleService
+    }
+    
+    func fetchArticles() -> Observable<[Article]> {
+        return articleService.fetchNews()
+    }
+}

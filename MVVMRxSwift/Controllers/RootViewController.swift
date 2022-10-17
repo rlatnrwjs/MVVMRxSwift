@@ -6,24 +6,47 @@
 //
 
 import UIKit
+import RxSwift
+import RxRelay
 
 class RootViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+    // MARK: Properties
+    let disposeBag = DisposeBag()
+    let viewModel: RootViewModel
+    
+    private let articles = BehaviorRelay<[Article]>(value: [])
+    var articlesObserver: Observable<[Article]> {
+        return articles.asObservable()
+    }
+    // MARK: Rifecycles
+    init(viewModel: RootViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-    */
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureUI()
+        fetchArticles()
+    }
+    func configureUI() {
+        view.backgroundColor = .systemBackground
+    }
+    
+    // MARK: Helpers
+    func fetchArticles() {
+        self.viewModel.fetchArticles().subscribe { articles in
+            self.articles.accept(articles)
+        }.disposed(by: disposeBag)
+    }
+    
+    func subscribe() {
+        self.articlesObserver.subscribe { articles in
+            // collectionview를 생성할건데요, 이때 collectionView.reloadData함수를 호출할거임
+        }.disposed(by: disposeBag)
 
+    }
 }
